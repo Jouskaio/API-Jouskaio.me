@@ -1,0 +1,23 @@
+{
+  "name": "api-jouskaio.me",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "dev": "node index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jouskaio/API-Jouskaio.me.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jouskaio/API-Jouskaio.me/issues"
+  },
+  "homepage": "https://github.com/Jouskaio/API-Jouskaio.me#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
