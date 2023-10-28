@@ -1,9 +1,14 @@
 import express from 'express'
-import email from './routes/email.mjs'
-
+import emailRouter from './routes/email.mjs'
+import dotenv from 'dotenv';
+// Configure dotenv to read .env file
+dotenv.config();
 const app = express()
+// Middleware to analyse JSON data in request body
+app.use(express.json());
 
-app.use('/api', email);
+// Routes
+app.use('/v1/email', emailRouter);
 
 
 app.listen(2000, () => {

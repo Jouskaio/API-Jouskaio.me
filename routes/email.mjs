@@ -1,17 +1,8 @@
-import express, { query } from 'express'
+import express from "express";
+import postEmail from "../controllers/email.mjs";
+const router = express.Router()
 
-const email = express.Router();
+router.post('/', postEmail)
 
 
-email.post('/newMessage', async (req, res) => {
-    try {
-        console.log(req.query);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error server");
-    }
-    res.end
-});
-
-export default email;
+export default router;
