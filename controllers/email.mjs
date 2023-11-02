@@ -2,8 +2,8 @@ import nodemailer from "nodemailer";
 
 export default async function postEmail(req, res) {
   try {
-    const { email, title, message, name } = req.query;
-    console.log('email', process.env.NODEMAILER_USER);
+    const { email, title, message, name } = req.body;
+    console.log('email', req.body);
     const mailOptions = {
       from: email,
       to: process.env.NODEMAILER_USER,
