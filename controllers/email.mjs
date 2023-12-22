@@ -2,13 +2,37 @@ import nodemailer from "nodemailer";
 import nodemailerNewMail from "../frameworks/services/nodemailer/newMail.mjs";
 
 export default async function postEmail(req, res) {
+  console.log(__dirname)
   try {
+
     const { email, title, message, name } = req.body;
     const mailOptions = {
       from: email,
       to: process.env.NODEMAILER_USER,
       subject: title,
-      html: nodemailerNewMail(title, message, name)
+      html: nodemailerNewMail(title, message, name),
+      attachments: [
+        {
+          filename: 'x.png',
+          path: __dirname + '/icons/x.png',
+          cid: 'twitter'
+        },
+        {
+          filename: 'insta.png',
+          path: __dirname + '/icons/insta.png',
+          cid: 'insta'
+        },
+        {
+          filename: 'linkedin.png',
+          path: __dirname + '/icons/linkedin.png',
+          cid: 'linkedin'
+        },
+        {
+          filename: 'spotify.png',
+          path: __dirname + '/icons/spotify.png',
+          cid: 'spotify'
+        },
+      ]
     };
 
     const transporter = nodemailer.createTransport({
