@@ -6,7 +6,7 @@ import cors from 'cors';
 dotenv.config();
 const app = express()
 // Define a list of allowed origins
-const allowedOrigins = ["http://localhost:3000", "https://jouskaio.me"];
+const allowedOrigins = ["http://localhost:3000", "https://jouskaio.me", "https://jouskaio-me-web-21c84692fbcb.herokuapp.com"];
 
 // Configure CORS to allow requests from specific origins
 const corsOptions = {
