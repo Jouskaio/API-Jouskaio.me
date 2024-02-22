@@ -28,6 +28,7 @@ app.use(express.json());
 app.use('/v1/email', emailRouter);
 
 
-app.listen(2000, () => {
-  console.log("Server listening on http://localhost:2000")  ;
-})
+const port = process.env.PORT || 2000; // Utilisez le port spécifié par l'environnement ou le port 2000 par défaut
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
