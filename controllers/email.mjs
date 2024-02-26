@@ -4,10 +4,6 @@ import nodemailerNewMail from "../frameworks/services/nodemailer/newMail.mjs";
 export default async function postEmail(req, res) {
   try {
     const { email, title, message, name } = req.body;
-    console.log('email', email);
-    console.log('title', title);
-    console.log('message', message);
-    console.log('name', name);
     const mailOptions = {
       from: email,
       to: process.env.NODEMAILER_USER,
@@ -59,6 +55,7 @@ export default async function postEmail(req, res) {
       });
     }
   } catch (error) {
+    console.error('An error occurred:', error.stack);
     return res.status(500).send('Internal Server Error');
   }
 }
