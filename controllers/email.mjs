@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import nodemailerNewMail from "../frameworks/services/nodemailer/newMail.mjs";
+import path from 'path';
 
 export default async function postEmail(req, res) {
   try {
@@ -12,22 +13,23 @@ export default async function postEmail(req, res) {
       attachments: [
         {
           filename: 'x.png',
-          path: __dirname + '/icons/x.png',
+          path: path.resolve(import.meta.url, '../icons/x.png'),
           cid: 'twitter'
         },
         {
           filename: 'insta.png',
-          path: __dirname + '/icons/insta.png',
+          path: path.resolve(import.meta.url, '../icons/insta.png'),
           cid: 'insta'
         },
         {
           filename: 'linkedin.png',
-          path: __dirname + '/icons/linkedin.png',
+          path: path.resolve(import.meta.url, '../icons/linkedin.png'),
+
           cid: 'linkedin'
         },
         {
           filename: 'spotify.png',
-          path: __dirname + '/icons/spotify.png',
+          path: path.resolve(import.meta.url, '../icons/spotify.png'),
           cid: 'spotify'
         },
       ]
