@@ -50,6 +50,7 @@ export default async function postEmail(req, res) {
     } else {
       await transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
+          console.error('An error occurred:', error.stack);
           return res.status(500).json({error: 'Error while sending an email from ' + email + ' to ' + process.env.NODEMAILER_USER + ' with title ' + title + ' : ' + error});
         } else {
           return res.json({message: 'Email send with success'});
