@@ -2,7 +2,6 @@ import nodemailer from "nodemailer";
 import nodemailerNewMail from "../frameworks/services/nodemailer/newMail.mjs";
 
 export default async function postEmail(req, res) {
-  console.log(__dirname)
   try {
 
     const { email, title, message, name } = req.body;
