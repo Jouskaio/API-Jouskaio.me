@@ -20,7 +20,7 @@ const corsOptions = {
 };
 
 // Enable CORS with the specified options
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 // Middleware to analyse JSON data in request body
 app.use(express.json());
 
