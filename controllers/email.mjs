@@ -13,23 +13,23 @@ export default async function postEmail(req, res) {
       attachments: [
         {
           filename: 'x.png',
-          path: path.resolve('../../public/icons/x.png'),
+          path: path.resolve('public/icons/x.png'),
           cid: 'twitter'
         },
         {
           filename: 'insta.png',
-          path: path.resolve('../../public/icons/insta.png'),
+          path: path.resolve('public/icons/insta.png'),
           cid: 'insta'
         },
         {
           filename: 'linkedin.png',
-          path: path.resolve('../../public/icons/linkedin.png'),
+          path: path.resolve('public/icons/linkedin.png'),
 
           cid: 'linkedin'
         },
         {
           filename: 'spotify.png',
-          path: path.resolve('../../public/icons/spotify.png'),
+          path: path.resolve('public/icons/spotify.png'),
           cid: 'spotify'
         },
       ]
