@@ -17,10 +17,12 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
+  methods: "GET,POST", // Allow only GET and POST methods
+  allowedHeaders: "Content-Type,Authorization", // Allow only specific headers
 };
 
 // Enable CORS with the specified options
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 // Middleware to analyse JSON data in request body
 app.use(express.json());
 
