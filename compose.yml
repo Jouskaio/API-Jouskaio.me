@@ -1,0 +1,26 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        WITH_OCR: ${WITH_OCR:-false} # true: handwriting OCR (kraken), amd64 only, +1.5 GB
+    # In production, pull the image published by the release workflow instead:
+    # image: ghcr.io/<your-github-user>/api-jouskaio.me:latest       (without OCR)
+    # image: ghcr.io/<your-github-user>/api-jouskaio.me:latest-ocr   (with OCR)
+    env_file: .env
+    # Run as the user that owns the vault on the host (Synology: see `id <user>`).
+    user: "${PUID:-10001}:${PGID:-10001}"
+    ports:
+      - "127.0.0.1:8000:8000" # put a reverse proxy / VPN in front, never expose directly
+    volumes:
+      - ${NOTES_INBOX_PATH:?set NOTES_INBOX_PATH in .env}:/inbox:ro
+      - ${OBSIDIAN_VAULT_PATH:?set OBSIDIAN_VAULT_PATH in .env}:/vault
+      - ${DATA_PATH:-./data}:/data
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

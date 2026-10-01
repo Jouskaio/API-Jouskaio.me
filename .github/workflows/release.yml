@@ -1,0 +1,63 @@
+name: Release
+
+# Triggered by a SemVer tag created on main, e.g.:  git tag v0.2.0 && git push --tags
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - with_ocr: "false"
+            suffix: ""
+          - with_ocr: "true"
+            suffix: "-ocr" # e.g. 1.2.0-ocr, latest-ocr
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          flavor: suffix=${{ matrix.suffix }},onlatest=true
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          build-args: WITH_OCR=${{ matrix.with_ocr }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=ocr-${{ matrix.with_ocr }}
+          cache-to: type=gha,mode=max,scope=ocr-${{ matrix.with_ocr }}
+
+  # Deployment: run on a self-hosted runner INSIDE the homelab so that nothing has to be
+  # exposed to the Internet. Uncomment once the runner is registered (label: homelab).
+  #
+  # deploy:
+  #   needs: publish
+  #   runs-on: [self-hosted, homelab]
+  #   steps:
+  #     - run: |
+  #         cd /opt/api-jouskaio.me
+  #         docker compose pull
+  #         docker compose up -d

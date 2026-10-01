@@ -1,0 +1,88 @@
+[project]
+name = "jouskaio-api"
+version = "0.1.0"
+description = "API Jouskaio.me: modular REST API for my apps, services and personal infrastructure"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.7",
+]
+
+[project.optional-dependencies]
+# Handwriting OCR (JOUSKAIO_NOTES_SYNC_OCR_ENGINE=kraken). Heavy (torch): only installed on
+# demand, with `uv sync --extra ocr` or the Docker build arg WITH_OCR=true.
+# kraken does not support Python 3.14 yet; on Linux its coremltools dependency only ships
+# x86_64 wheels.
+ocr = [
+    "kraken>=7.1,<8; python_version < '3.14'",
+    "torch>=2.9,<=2.14; python_version < '3.14'",
+    "torchvision; python_version < '3.14'", # pinned here only to route it to the CPU index
+    "pypdfium2>=4.30",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27",
+    "mypy>=1.13",
+    "pillow>=10",
+    "pre-commit>=4.0",
+    "pypdfium2>=4.30",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "pytest-watcher>=0.4",
+    "ruff>=0.8",
+]
+
+# On Linux, take torch from the CPU-only index: the default wheel pulls several GB of CUDA
+# libraries that are useless on a VM without GPU.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+torchvision = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jouskaio_api"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["slow: loads real models (excluded from the watch mode: -m 'not slow')"]
+
+[tool.coverage.run]
+source = ["jouskaio_api"]
+branch = true
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+# Optional (ocr extra) and untyped: same result whether or not the extra is installed.
+module = ["kraken.*", "torch.*", "pypdfium2.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "N", "S", "C4", "PTH", "RUF", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Security"]
