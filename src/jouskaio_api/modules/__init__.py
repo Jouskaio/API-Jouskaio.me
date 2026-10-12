@@ -9,8 +9,10 @@ factory, register it below, and enable it with ``JOUSKAIO_ENABLED_MODULES``.
 from collections.abc import Mapping
 
 from jouskaio_api.core.module import ModuleFactory
+from jouskaio_api.modules.news import build_module as build_news
 from jouskaio_api.modules.notes_sync import build_module as build_notes_sync
 
 MODULE_FACTORIES: Mapping[str, ModuleFactory] = {
+    "news": build_news,
     "notes_sync": build_notes_sync,
 }
