@@ -18,6 +18,11 @@ data/
 dev/*
 !dev/.gitkeep
 
+# Local tooling
+.claude/
+CLAUDE.md
+.mcp.json
+
 .idea/
 .vscode/
 .DS_Store
