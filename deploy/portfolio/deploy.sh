@@ -3,7 +3,8 @@
 #
 # One-time prerequisites on the host, for the SSH user of the SERVER_USERNAME secret:
 #   - member of the `docker` group (`sudo usermod -aG docker <user>`, then log in again)
-#   - `docker login ghcr.io` done once, because the GHCR package is private by default
+#   - the GHCR package is public (the repository is), so no `docker login` is needed. After
+#     the first release, check Packages > api-jouskaio.me > Package settings > Visibility.
 #   - APP_DIR below holds a `.env` made from .env.example, and a writable `data/` folder
 set -euo pipefail
 
