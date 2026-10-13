@@ -50,14 +50,33 @@ jobs:
           cache-from: type=gha,scope=ocr-${{ matrix.with_ocr }}
           cache-to: type=gha,mode=max,scope=ocr-${{ matrix.with_ocr }}
 
-  # Deployment: run on a self-hosted runner INSIDE the homelab so that nothing has to be
-  # exposed to the Internet. Uncomment once the runner is registered (label: homelab).
-  #
-  # deploy:
-  #   needs: publish
-  #   runs-on: [self-hosted, homelab]
-  #   steps:
-  #     - run: |
-  #         cd /opt/api-jouskaio.me
-  #         docker compose pull
-  #         docker compose up -d
+  # Deployment on the "portfolio" host, reached through Tailscale (nothing is exposed to the
+  # Internet). It runs the image just published; the secrets are the same as WEB-Jouskaio.me.
+  deploy:
+    name: Deployment
+    needs: publish
+    runs-on: ubuntu-latest
+    env:
+      SSHPASS: ${{ secrets.SERVER_PASSWORD }}
+      SERVER: ${{ secrets.SERVER_USERNAME }}@192.168.1.101
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci
+          version: latest
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Update the compose file on the server
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no "$SERVER" \
+            "cat > /home/user/Documents/api.jouskaio.me/compose.yml" < deploy/portfolio/compose.yml
+
+      - name: Pull the image and restart the API
+        run: sshpass -e ssh -o StrictHostKeyChecking=no "$SERVER" 'bash -s' < deploy/portfolio/deploy.sh
