@@ -1,0 +1,22 @@
+# Production stack on the "portfolio" host: the image published by release.yml, with the
+# `news` module only (no Notability inbox or Obsidian vault on this machine).
+# Copied to /home/user/Documents/api.jouskaio.me/compose.yml by the deploy job.
+services:
+  api:
+    image: ghcr.io/jouskaio/api-jouskaio.me:latest
+    env_file: .env
+    # Owner of ./data on the host (`id -u` and `id -g`, set in .env).
+    user: "${PUID:-1000}:${PGID:-1000}"
+    ports:
+      # Same port the old API used, so the reverse proxy keeps working. Never expose directly.
+      - "127.0.0.1:2000:8000"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

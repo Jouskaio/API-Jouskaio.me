@@ -6,6 +6,7 @@ One modular REST API for my apps, services and personal infrastructure. Each cap
 | Module | Status | Purpose |
 |---|---|---|
 | `notes_sync` | ✅ Available | Brings my **Notability** notes into my **Obsidian** vault, with local handwriting OCR |
+| `news` | ✅ Available | The news card (date and message) of the portfolio homepage |
 | `orchestrator` | 🔜 Planned | Infrastructure orchestration: Proxmox, Docker, Synology, media |
 
 The interactive documentation (Swagger) is served at `/api/v1/docs` when
@@ -82,6 +83,8 @@ Every error has the same body:
 | GET | `/api/v1/notes-sync/runs` | `200`, `401` | Recent runs, newest first |
 | GET | `/api/v1/notes-sync/runs/{job_id}` | `200`, `401`, `404` | One run and its per-note report |
 | GET | `/api/v1/notes-sync/notes` | `200`, `401` | Notes already synchronised |
+| GET | `/api/v1/news` | `200`, `401` | The news card shown on the portfolio homepage |
+| PUT | `/api/v1/news` | `200`, `401`, `422`, `502` | Replace its date and message (1 to 280 characters) |
 
 Every route can also answer `500`. When docs are enabled, `GET /` redirects to `/api/v1/docs`.
 
@@ -117,6 +120,12 @@ Paths are the ones **inside** the container; the defaults match the Docker volum
 | `JOUSKAIO_NOTES_SYNC_OCR_DPI` | `200` | Page rendering resolution (100 to 400): lower is faster, less accurate |
 | `JOUSKAIO_NOTES_SYNC_OCR_MAX_PAGES` | `30` | Pages recognised per note at most |
 | `JOUSKAIO_NOTES_SYNC_OCR_THREADS` | `1` | CPU threads used by the OCR |
+
+### news
+
+| Variable | Default | Description |
+|---|---|---|
+| `JOUSKAIO_NEWS_STATE_FILE` | `/data/news.json` | Where the current card is kept. Until the first `PUT`, the API serves the card shipped with it |
 
 ### Docker Compose
 
@@ -328,12 +337,14 @@ acceptable here.
 
 ## Git workflow and CI/CD
 
-Lightweight git flow for a solo project:
+Git flow (`git flow init -d`, branches `main` and `develop`):
 
 - `main`: always deployable, protected (pull request and green CI required).
 - `develop`: integration.
-- `feature/*`, `fix/*`: short-lived branches from `develop`, merged through pull requests.
-- Release: pull request `develop → main`, then a SemVer tag `vX.Y.Z` on `main`.
+- `feature/*`, `bugfix/*`: short-lived branches from `develop` (`git flow feature start <name>`).
+- Release: `git flow release start vX.Y.Z` from `develop`, bump the version, push the branch and
+  open a pull request `release/vX.Y.Z → main`. Once merged, tag `vX.Y.Z` on `main` (this deploys),
+  then merge `main` back into `develop`.
 - **Conventional Commits** (`feat:`, `fix:`, `chore:`...), enforced by the `commitizen` hook.
 
 ```bash
@@ -345,8 +356,12 @@ uv run pre-commit install --hook-type pre-commit --hook-type commit-msg --hook-t
   model, then a Docker build of both variants (with and without OCR), not pushed.
 - **`release.yml`** (tags `v*.*.*`): builds and pushes two images to GHCR, `X.Y.Z`/`latest` and
   `X.Y.Z-ocr`/`latest-ocr`.
-- **Deployment**: a commented job in `release.yml`, meant for a **self-hosted runner inside the
-  homelab** (nothing exposed). Enable it once the runner is registered.
+- **Deployment**: the `deploy` job of `release.yml` runs after the images are published. It reaches
+  the `portfolio` host through Tailscale (nothing exposed), updates `compose.yml` there and runs
+  `deploy/portfolio/deploy.sh` (`docker compose pull && up -d`, then waits for `/api/v1/health`).
+  It needs the repository secrets `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_CLIENT_SECRET`,
+  `SERVER_USERNAME` and `SERVER_PASSWORD`. First install on the host: see
+  `deploy/portfolio/.env.example`.
 
 Protect `main` in *Settings > Branches* and require the `quality` and `ocr` jobs.
 
