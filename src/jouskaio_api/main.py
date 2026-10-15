@@ -96,8 +96,9 @@ def create_app(
         docs_url=f"{API_PREFIX}/docs" if settings.enable_docs else None,
         openapi_url=f"{API_PREFIX}/openapi.json" if settings.enable_docs else None,
         redoc_url=None,
-        # Keep the token entered in "Authorize" across page reloads (handy with --reload).
-        swagger_ui_parameters={"persistAuthorization": True},
+        # Opt-in (JOUSKAIO_DOCS_PERSIST_AUTHORIZATION): handy with --reload, but it stores the
+        # token in the browser.
+        swagger_ui_parameters={"persistAuthorization": settings.docs_persist_authorization},
     )
     register_http_layer(app)
 
