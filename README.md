@@ -100,7 +100,8 @@ the module is enabled.
 | `JOUSKAIO_API_TOKEN` | *(required)* | Bearer token, at least 32 characters (`openssl rand -hex 32`) |
 | `JOUSKAIO_ENABLED_MODULES` | `notes_sync` | Comma-separated modules to mount; an unknown name stops the startup |
 | `JOUSKAIO_LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING` or `ERROR`; logs are JSON lines |
-| `JOUSKAIO_ENABLE_DOCS` | `false` | Serve Swagger and the OpenAPI schema; keep `false` in production |
+| `JOUSKAIO_ENABLE_DOCS` | `false` | Serve Swagger and the OpenAPI schema; keep `false` in production unless you need it |
+| `JOUSKAIO_DOCS_PERSIST_AUTHORIZATION` | `false` | Swagger remembers the token across reloads (development only: it stays in the browser) |
 
 ### notes_sync
 
