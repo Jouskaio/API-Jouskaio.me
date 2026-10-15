@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     enabled_modules: Annotated[list[str], NoDecode] = ["notes_sync"]
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     enable_docs: bool = False
+    docs_persist_authorization: bool = False
+    """Swagger keeps the token typed in "Authorize" across page reloads. Handy in development,
+    but it leaves the token in the browser: keep ``False`` on a public domain."""
 
     @field_validator("enabled_modules", mode="before")
     @classmethod

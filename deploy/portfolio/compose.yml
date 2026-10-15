@@ -8,8 +8,10 @@ services:
     # Owner of ./data on the host (`id -u` and `id -g`, set in .env).
     user: "${PUID:-1000}:${PGID:-1000}"
     ports:
-      # Same port the old API used, so the reverse proxy keeps working. Never expose directly.
-      - "127.0.0.1:2000:8000"
+      # Same port the old API used. Reached on the LAN by the reverse proxy (Nginx Proxy Manager,
+      # another machine: api.jouskaio.me -> http://192.168.1.101:2000) and locally by the deploy
+      # health check. Do not forward this port on the router: only the proxy is public.
+      - "2000:8000"
     volumes:
       - ./data:/data
     restart: unless-stopped
